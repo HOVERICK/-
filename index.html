@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>부서별 조원 정보</title>
+</head>
+<body>
+    <h1>부서별 팀원 정보</h1>
+
+    <label for="department">부서를 선택하세요:</label>
+    <select id="department">
+        <option value="">부서 선택</option>
+        <option value="Project Management">Project Management</option>
+        <option value="Biostatistics">Biostatistics</option>
+        <option value="Clinical Operations">Clinical Operations</option>
+        <option value="Large Molecular Lab">Large Molecular Lab</option>
+        <option value="Data Management">Data Management</option>
+        <option value="Financial Controlling">Financial Controlling</option>
+        <option value="Medical Writing">Medical Writing</option>
+        <option value="Small Molecular Lab">Small Molecular Lab</option>
+    </select>
+
+    <h2>선택된 부서의 팀원 정보:</h2>
+    <div id="team-info"></div>
+
+    <script>
+        // 원본 텍스트 데이터를 그대로 붙여넣기 (띄어쓰기로 구분된 형식)
+        const rawData = `
+1조	1	SeJin Park	박세진	Clinical Operations
+1조	2	DoKyoung Kim	김도경	Project Management
+1조	3	HyeJin You	유혜진	Biostatistics
+1조	4	Misook Lee	이미숙	Project Management
+1조	5	SoRin Kim	김소린	Clinical Operations
+1조	6	Hailey Min	민혜령	Clinical Operations
+1조	7	Dabin Guk	국다빈	Large Molecular Lab
+1조	8	MyungHee Choi	최명희	Clinical Operations
+1조	9	Kay Lee	이경은	Clinical Operations
+1조	10	SuJin Chung	정수진	Quality Assurance
+2조	11	Jai Kim	김지영	Marketing
+2조	12	Jonghee Park	박종희	Workforce Planning & Talent Acquisition
+2조	13	DongHee Kim	김동희	Lab Shared Service
+2조	14	JaeWoo Lee	이재우	Project Management
+2조	15	IlSuk Ham	함일숙	Clinical Operations
+2조	16	Soyoung Park	박소영	Clinical Operations
+2조	17	Zoey Kim	김지연	Small Molecular Lab
+2조	18	Kate Koo	구하영	Clinical Operations
+2조	19	Suji Choi	최수지	Clinical Operations
+2조	20	Claire Kim	김보림	Clinical Operations
+3조	21	JiHye Baek	백지혜	SMU - Region 1
+3조	22	Stella Yoo	유새별	Pharmacovigilance
+3조	23	Wanda Goo	구지현	Data Management
+3조	24	JooWon Shin	신주원	Lab Shared Service
+3조	25	JuHwan Park	박주환	Clinical Operations
+3조	26	Joy Choi	최유진	Clinical Operations
+3조	27	Yuna Noh	노유나	Clinical Operations
+3조	28	Mingeol Jang	장민걸	Data Management
+3조	29	SooHyung Cho	조수형	Project Management
+3조	30	HuiEun Im	임희은	Quality Assurance
+4조	31	YeonBee Park	박연비	Data Management
+4조	32	Daisy Kim	김지영	Clinical Operations
+4조	33	Dongyun Ham	함동연	Clinical Operations
+4조	34	Sumin Cho	조수민	Project Management
+4조	35	HyeJeong Yeom	염혜정	Small Molecular Lab
+4조	36	Yookyung Kim	김유경	Biostatistics
+4조	37	Dahyun Lee	이다현	Clinical Operations
+4조	38	Hyo Soon Jung	정효순	Clinical Operations
+4조	39	Sooji Kim	김수지	Small Molecular Lab
+4조	40	Jieun Kwak	곽지은	Project Management
+5조	41	AhRa Cho	조아라	Project Management
+5조	42	Jun HwangBo	황보 준	Clinical Operations
+5조	43	Junhyeok Jeong	정준혁	Small Molecular Lab
+5조	44	MinJu Kim	김민주	Lab Shared Service
+5조	45	Yujin Nam	남유진	Clinical Operations
+5조	46	Jihyun Park	박지현	Clinical Operations
+5조	47	Uju Shin	신우주	Clinical Operations
+5조	48	Gayoung Park	박가영	Transactions
+5조	49	Naun Chai	채나은	Clinical Operations
+5조	50	Heather Lee	이혜정	Biostatistics
+6조	51	Somi Kim	김소미	Project Management
+6조	52	Mideok Kim	김미덕	Clinical Operations
+6조	53	Angela Lee	이가영	Clinical Operations
+6조	54	MiSol Chae	채미솔	Clinical Operations
+6조	55	Junseob Lee	이준섭	Small Molecular Lab
+6조	56	YuMi Heo	허유미	Small Molecular Lab
+6조	57	Keunhong Park	박근홍	Clinical Operations
+6조	58	Tori Choi	최다연	Clinical Operations
+6조	59	Julia Jung	정래선	Biostatistics
+6조	60	MiSeon Kwon	권미선	Regulatory Affairs
+7조	61	Jeongmi Choi	최정미	SMU - Region 1
+7조	62	Seongho Jeong	정성호	Clinical Operations
+7조	63	Jeong Juhn	전정	Clinical Operations
+7조	64	Miri Jang	장미리	Clinical Operations
+7조	65	Sujin Kang	강수진	Clinical Operations
+7조	66	Minji Kim	김민지	Data Management
+7조	67	Umin Seo	서유민	Small Molecular Lab
+7조	68	BoNa Park	박보나	Small Molecular Lab
+7조	69	EunSol Jung	정은솔	Project Management
+7조	70	Yurim Kim	김유림	Clinical Operations
+8조	71	Jenia Kim	김유리	Project Management
+8조	72	Daham Kwak	곽다함	Clinical Operations
+8조	73	MyeongSu Kim	김명수	Clinical Operations
+8조	74	DaHong Kim	김다홍	Project Management
+8조	75	Hojun Lee	이호준	Small Molecular Lab
+8조	76	Kyungmin Cha	차경민	Clinical Operations
+8조	77	Kyunghyun Kim	김경현	Pharmacovigilance
+8조	78	Daniel Kim	김다니엘	SMU - Region 1
+8조	79	Noah Jung	정승필	Clinical Operations
+8조	80	BoEun Park	박보은	Data Management
+9조	81	Zoey Park	박지은	Workforce Planning & Talent Acquisition
+9조	82	Juneho Kim	김준호	Clinical Operations
+9조	83	Marina Kim	김종례	Transactions
+9조	84	SangWoo Yoon	윤상우	Clinical Operations
+9조	85	Chloe Choi	최민경	Workforce Planning & Talent Acquisition
+9조	86	Sean Lee	이정영	IT Operations
+9조	87	HanMee Oh	오한미	Project Management
+9조	88	Hyein Kwon	권혜인	Data Management
+9조	89	SeongKyeong Kim	김성경	Biostatistics
+9조	90	Jinmoo Heo	허진무	Small Molecular Lab
+10조	91	JinHa Yoo	유진하	Project Management
+10조	92	Chongho Won	원종호	Clinical Operations
+10조	93	Jaehee Kim	김재희	Biostatistics
+10조	94	Jisu Choi	최지수	Regulatory Affairs
+10조	95	Soojin Hong	홍수진	Project Management
+10조	96	Caleb Kwon	권은호	IT Operations
+10조	97	HeeJin Lee	이희진	Data Management
+10조	98	Dayoung Lim	임다영	Clinical Operations
+10조	99	Hyesu Park	박혜수	Clinical Operations
+10조	100	SuJin Kim	김수진	Regulatory Affairs
+11조	101	Lily Park	박소영	Clinical Operations
+11조	102	Choongho Kim	김충호	Clinical Operations
+11조	103	Deana Jung	정다운	Financial Controlling
+11조	104	MeeHee Yang	양미희	Clinical Operations
+11조	105	Beth Choi	최지혜	Project Management
+11조	106	Sooyeon Jee	지수연	Project Management
+11조	107	Donggeon Kim	김동건	Clinical Operations
+11조	108	Jiyoon Oh	오지윤	Clinical Operations
+11조	109	Haejong Jang	장해종	Small Molecular Lab
+11조	110	Joohyun Cho	조주현	Regulatory Affairs
+12조	111	Flora Lee	이현정	Financial Planning & Analysis
+12조	112	Sunyoung Moon	문선영	Data Management
+12조	113	KwangEun Kim	김광은	Regulatory Affairs
+12조	114	Erin Kim	김은혜(Erin Kim)	Clinical Operations
+12조	115	Hyunkyung Kwon	권현경	Project Management
+12조	116	Hyejin Lee	이혜진	Clinical Operations
+12조	117	Chaehee Lee	이채희	Data Management
+12조	118	Juhyun Ahn	안주현	Clinical Operations
+12조	119	SoHui Nam	SoHui Nam	Clinical Operations
+12조	120	Jayden Kim	김진희	Clinical Operations
+13조	121	Danny Eom	엄대영	Clinical Operations
+13조	122	Yoonjung Cho	조윤정	Regulatory Affairs
+13조	123	Sewon Jeong	정세원	Pharmacovigilance
+13조	124	HaeJung Lee	이해정	Clinical Operations
+13조	125	Keeyoung Hong	홍기영	Project Management
+13조	126	Dan Chung	정단	Clinical Operations
+13조	127	JeongWon Kim	김정원	Clinical Operations
+13조	128	EunJu Oh	오은주	Project Management
+13조	129	Younkyung Hyun	현윤경	Project Management
+13조	130	BoRa Yeon	연보라	Financial Controlling
+14조	131	TaeMin Kim	김태민	Small Molecular Lab
+14조	132	Hyeeun Han	한혜은	Clinical Operations
+14조	133	DaHee Yoon	윤다희	Data Management
+14조	134	KaYoung Kim	김가영	Data Management
+14조	135	YoungJun Bae	배영준	Biostatistics
+14조	136	Sunho Park	박선호	Regulatory Affairs
+14조	137	Seungha Lee	이승하	Clinical Operations
+14조	138	YuJin Choi	최유진	Data Management
+14조	139	Hyeyoung Lim	임혜영	Project Management
+14조	140	Chloe Choi	최윤정	Biostatistics
+15조	141	Hyeonsoo Park	박현수	Data Management
+15조	142	Sohyun Doo	두소현	Pharmacovigilance
+15조	143	Jinah Lee	이진아	Regulatory Affairs
+15조	144	Michelle Park	박민선	Clinical Operations
+15조	145	Jiyeong Hong	홍지영	Clinical Operations
+15조	146	Hyuna Jang	장현아	Project Management
+15조	147	Jinyi Baek	백진이	Clinical Operations
+15조	148	HyunUk Ro	노현욱	Clinical Operations
+15조	149	JiHyeon Song	송지현	Regulatory Affairs
+15조	150	Bibi Song	송보배	Clinical Operations
+16조	151	JiHyun Lim	임지현	Clinical Operations
+16조	152	Hyewon Choe	최혜원	Clinical Operations
+16조	153	Jenna Ahn	안지영	HR Operations
+16조	154	MinSoo Kwon	권민수	Medical Writing
+16조	155	Eunjeong Lee	이은정	Clinical Operations
+16조	156	Yeri Kim	김예리	Data Management
+16조	157	YouJin Bae	배유진	Biostatistics
+16조	158	HyeJin Kim	김혜진	Regulatory Affairs
+16조	159	JungHwan Lee	이정환	Clinical Operations
+16조	160	SeHee Shin	신세희	Clinical Operations
+17조	161	YunSun Lee	이윤선	Clinical Operations
+17조	162	HyeWon Kang	강혜원	Small Molecular Lab
+17조	163	Dohyeon Lee	이도현	Clinical Operations
+17조	164	Kelsey Kim	김민경	Transactions
+17조	165	Juah Yoo	류주아	Regulatory Affairs
+17조	166	Clare Kim	김해슬	Clinical Operations
+17조	167	Sungpill Yu	유성필	Regulatory Affairs
+17조	168	Miran Kim	김미란	Project Management
+17조	169	Hyunja Jung	정현자	Clinical Operations
+17조	170	Minhyun Lee	이민현	Clinical Operations
+18조	171	SeYoung Jung	정세영	Biostatistics
+18조	172	Yaelim Kim	김예림	Biostatistics
+18조	173	Dayeon Kim	김다연	Financial Controlling
+18조	174	Jason Yeon	연승민	Biostatistics
+18조	175	Hana Kim	김하나	Clinical Operations
+18조	176	Sabina Bang	방사비나	Small Molecular Lab
+18조	177	SeungHyun Cho	조승현	Data Management
+18조	178	Veronica Kim	김수현	Regulatory Affairs
+18조	179	Grace Kim	김성은	Clinical Operations
+18조	180	Naeun Bang	방나은	Clinical Operations
+19조	181	SoRa Kim	김소라	Clinical Operations
+19조	182	ChaeYeon Lee	이채연	Lab Shared Service
+19조	183	Amy Park	박미애	Regulatory Affairs
+19조	184	Ji Yeon Lee	이지연	Therapeutic Strategy
+19조	185	Soyoung Kim	김소영	Small Molecular Lab
+19조	186	NanHee Kim	김난희	Small Molecular Lab
+19조	187	SangA Park	박상아	Clinical Operations
+19조	188	MinYoung Ko	고민영	Pharmacovigilance
+19조	189	Yousun Kim	김유선	Project Management
+19조	190	SuMi Mun	문수미	Data Management
+20조	191	Bom-I Kwon	권봄이	Project Management
+20조	192	Youngnam Kim	김영남	Data Management
+20조	193	Dahye Shin	신다혜	Clinical Operations
+20조	194	Rihyun Kwon	권리현	Clinical Operations
+20조	195	Jinhyun Wi	위진현	Regulatory Affairs
+20조	196	Kyungjin Song	송경진	Clinical Operations
+20조	197	Allie Na	나정선	Clinical Operations
+20조	198	Hyeonjin Choi	최현진	Clinical Operations
+20조	199	Emma Park	박근영	HR Operations
+20조	200	Howon Yu	유호원	Clinical Operations
+21조	201	SunMi Kim	김선미	Clinical Operations
+21조	202	Hyun Kim	김현경	Project Management
+21조	203	Mina Moon	문민화	Project Finance
+21조	204	Jennie Park	박시현	Clinical Operations
+21조	205	Boram Kim	김보람	Clinical Operations
+21조	206	Youngeun Im	Youngeun Im	Clinical Operations
+21조	207	Jae Yoo Hwang	황재유	Transactions
+21조	208	Taeuk Kyung	경태욱	Clinical Operations
+21조	209	MiJin Kim	김미진	Clinical Operations
+21조	210	Tae Heon Kim	김태헌	Clinical Operations
+22조	211	Sukhwan Jang	장석환	Clinical Operations
+22조	212	Hyungju Kim	김형주	Biostatistics
+22조	213	JaeGeun Lee	이재근	Small Molecular Lab
+22조	214	MiYoung Bae	배미영	Lab Shared Service
+22조	215	Yumin Sim	심유민	Regulatory Affairs
+22조	216	Heeyoun Oh	오희연	Data Management
+22조	217	Heeji Yoon	윤희지	Clinical Operations
+22조	218	Jinyoung Kim	김진영	Medical Writing
+22조	219	Dajeong Jeon	전다정	Data Management
+22조	220	Jade Lee	이진선	Project Management
+23조	221	Subin Park	박수빈	Clinical Operations
+23조	222	Jinyoung Lee	이진영	Clinical Operations
+23조	223	SungHee Youn	윤성희	Project Management
+23조	224	Jisun Jang	장지선	Clinical Operations
+23조	225	WonMi Lee	이원미	Data Management
+23조	226	SooHyun Lee	이수현	Project Management
+23조	227	Hailey Jang	장혜영	Project Management
+23조	228	Inha Choi	최인하	Clinical Operations
+23조	229	Amy Heo	허정임	Project Management
+23조	230	Jooyeon Lee	이주연	Project Management
+24조	231	Jongho Park	박종호	Clinical Operations
+24조	232	Yunyeong Choi	최윤영	Clinical Operations
+24조	233	JunKi Hong	홍준기	Small Molecular Lab
+24조	234	JiHye Seon	선지혜	Project Management
+24조	235	Woojin Kim	김우진	Clinical Operations
+24조	236	Na-Young Kim	김나영	Clinical Operations
+24조	237	SeonJeong Kwon	권선정	Data Management
+24조	238	Heejin An	안희진	Regulatory Affairs
+24조	239	Zoey Choi	최선희	Clinical Operations
+24조	240	YeaSeul Lim	임예슬	Lab Shared Service
+25조	241	Jieun Kim	김지은	Pharmacovigilance
+25조	242	Mi Hee Lyu	류미희	Regulatory Affairs
+25조	243	Garam Park	박가람	Clinical Operations
+25조	244	Julie Shin	신정훈	Pharmacovigilance
+25조	245	JiEon Song	송지언	Project Management
+25조	246	Yooni Kim	김윤이	Executive
+25조	247	Hyewon Lee	이혜원	Clinical Operations
+25조	248	Jinny Lee2	이혜진	Clinical Operations
+25조	249	Rachael Jang	장미정	HR Operations
+25조	250	Seoah Choi	최서아	Data Management
+26조	251	Heewon Kim	김희원	Biostatistics
+26조	252	Hyeran Min	민혜란	Project Management
+26조	253	JoungLee Lim	임정이	Project Management
+26조	254	Ungu Kang	강은구	Regulatory Affairs
+26조	255	WonJin Jung	정원진	Data Management
+26조	256	Jeongbeen Lee	이정빈	Small Molecular Lab
+26조	257	Yaeji Seo	서예지	Clinical Operations
+26조	258	HyunJung Kim	김현정	Clinical Operations
+26조	259	SongYee Yoo	유송이	Pharmacovigilance
+26조	260	Hyunju Ahn	안현주	SMU - Region 1
+27조	261	Seulki Lee	이슬기	Clinical Operations
+27조	262	Rachel Park	박성결	Clinical Operations
+27조	263	Jane Kim	김지현	Clinical Operations
+27조	264	Callie Cho	조은영	Clinical Operations
+27조	265	Hyowon Lee	이효원	Data Management
+27조	266	JinWoo Lee	이진우	Medical Writing
+27조	267	JiSook Lim	임지숙	Medical Writing
+27조	268	Doyeon Park	박도연	Medical Writing
+27조	269	Subin Song	송수빈	Clinical Operations
+27조	270	Grace Park	박은혜	Clinical Operations
+28조	271	Iksu Jang	장익수	Project Management
+28조	272	Yunseo Lee	이윤서	Financial Controlling
+28조	273	Taesu Kim	김태수	IT Operations
+28조	274	YunJeong Bae	배윤정	Pharmacovigilance
+28조	275	Bitna Cho	조빛나	Data Management
+28조	276	Demi Kim	김무늬	Clinical Operations
+28조	277	Ann Son	손윤경	Financial Controlling
+28조	278	Skylar Park	박소영	Data Management
+28조	279	SeEun Lee	이세은	Medical Writing
+28조	280	YoonShin Kim	김윤신	Clinical Operations
+29조	281	Nylah Ahn	안나언	Clinical Operations
+29조	282	Inji Park	박인지	Clinical Operations
+29조	283	HyeRin Jin	진혜린	Small Molecular Lab
+29조	284	Aimee Hwang	황신하	Pharmacovigilance
+29조	285	DaHye Choi	최다혜	Project Management
+29조	286	DaYoung Kang	강다영	Small Molecular Lab
+29조	287	Mia Son	손민행	Transactions
+29조	288	MinJi Kim	김민지	Quality Assurance
+30조	289	Bora Yoon	윤보라	Clinical Operations
+30조	290	ARan Kim	김아란	Biostatistics
+30조	291	Mikyung Jeon	전미경	Project Management
+30조	292	Sohee Han	한소희	Clinical Operations
+30조	293	MinKyeong Lee	이민경	SMU - Region 1
+30조	294	Sooyeon Choi	최수연	Clinical Operations
+30조	295	Summer Chung	정소라	HR Operations
+30조	296	InHye Oh	오인혜	Business Development
+31조	297	Adrian Jeon	전윤호	Business Development
+31조	298	Lilian Kim	김근영	Business Development
+31조	299	EunKyung Heo	허은경	Business Development
+31조	300	HaeJin Ahn	안혜진	Business Development
+31조	301	Sunny Park	박소영	Business Development
+31조	302	Jonathan Kim	김선규	Business Development
+31조	303	WooJu Kim	김우주	Business Development
+31조	304	Jin Im	임지은	Business Development
+         
+        `;
+
+        // 텍스트 데이터를 객체 배열로 변환
+        const attendees = rawData.trim().split('\n').map(line => {
+            const parts = line.split(/\s+/);  // 여러 공백으로 구분
+            return {
+                group: parts[0],  // 조
+                number: parts[1],  // 넘버
+                name: parts[2] + " " + parts[3], // 영어 이름 + 한글 이름
+                koreanName: parts[3], // 한글 이름
+                department: parts.slice(4).join(' ') // 나머지는 부서명
+            };
+        });
+
+        // 부서를 선택했을 때 해당 부서의 팀원 정보 표시하는 함수
+        function updateTeamInfo(department) {
+            const infoContainer = document.getElementById("team-info");
+            infoContainer.innerHTML = "";  // 기존 내용 비우기
+
+            // 부서가 선택되지 않았으면 바로 리턴
+            if (!department) {
+                return;
+            }
+
+            // 해당 부서에 속한 참석자 필터링
+            const filteredAttendees = attendees.filter(attendee => attendee.department === department);
+
+            // 부서별로 조에 속한 팀원 정보 분류
+            let groups = {};
+
+            // 부서별로 조에 속한 팀원 정보 분류
+            filteredAttendees.forEach(attendee => {
+                const group = attendee.group;
+                if (!groups[group]) {
+                    groups[group] = [];
+                }
+                groups[group].push({
+                    number: attendee.number,
+                    name: attendee.name,
+                    koreanName: attendee.koreanName
+                });
+            });
+
+            // 그룹별로 출력
+            Object.keys(groups).forEach(group => {
+                const groupInfo = groups[group];
+                const groupTitle = document.createElement("h3");
+                groupTitle.textContent = `조: ${group}`;
+                infoContainer.appendChild(groupTitle);
+
+                groupInfo.forEach(member => {
+                    const listItem = document.createElement("p");
+                    listItem.textContent = `번호: ${member.number}, 이름: ${member.name} (${member.koreanName})`;
+                    infoContainer.appendChild(listItem);
+                });
+            });
+        }
+
+        // 드롭다운에서 부서 선택 시 실행되는 이벤트
+        document.getElementById("department").addEventListener("change", function() {
+            const selectedDepartment = this.value;
+            updateTeamInfo(selectedDepartment);  // 해당 부서의 팀원 목록 업데이트
+        });
+    </script>
+</body>
+</html>
