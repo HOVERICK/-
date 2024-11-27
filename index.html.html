@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>부서별 조 확인</title>
+    <script>
+        function showTeams() {
+            // 부서와 팀원 데이터를 사전 정의
+            const department = document.getElementById("department").value;
+            const data = {
+                "인사팀": [
+                    { name: "김철수", team: "1조" },
+                    { name: "이영희", team: "2조" },
+                    { name: "박민수", team: "3조" }
+                ],
+                "마케팅팀": [
+                    { name: "홍길동", team: "1조" },
+                    { name: "최자영", team: "4조" }
+                ],
+                "개발팀": [
+                    { name: "정우성", team: "2조" },
+                    { name: "박지성", team: "3조" }
+                ]
+            };
+
+            // 선택한 부서에 해당하는 데이터 가져오기
+            const result = data[department] || [];
+            let display = result.map(item => `<p>${item.name}: ${item.team}</p>`).join("");
+            if (!display) display = "<p>데이터가 없습니다.</p>";
+
+            // 결과 출력
+            document.getElementById("result").innerHTML = display;
+        }
+    </script>
+</head>
+<body>
+    <h1>부서별 조 확인</h1>
+    <label for="department">부서를 선택하세요:</label>
+    <select id="department" onchange="showTeams()">
+        <option value="">--부서 선택--</option>
+        <option value="인사팀">인사팀</option>
+        <option value="마케팅팀">마케팅팀</option>
+        <option value="개발팀">개발팀</option>
+    </select>
+    <div id="result" style="margin-top: 20px;"></div>
+</body>
+</html>
